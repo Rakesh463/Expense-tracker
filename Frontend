@@ -1,0 +1,154 @@
+3.1 Initialize Front-End
+Navigate to the frontend/ folder and initialize a React project.
+
+bash
+
+cd ../frontend
+npx create-react-app .
+npm install axios
+
+3.2 Create Components
+3.2.1 ExpenseForm Component
+Create a components/ExpenseForm.js file.
+
+// frontend/src/components/ExpenseForm.js
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const ExpenseForm = ({ fetchExpenses }) => {
+  const [title, setTitle] = useState('');
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await axios.post('/api/expenses', { title, amount, category });
+    setTitle('');
+    setAmount('');
+    setCategory('');
+    fetchExpenses();
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label>Title:</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </div>
+      <div>
+        <label>Amount:</label>
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+      </div>
+      <div>
+        <label>Category:</label>
+        <input
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+      </div>
+      <button type="submit">Add Expense</button>
+    </form>
+  );
+};
+
+export default ExpenseForm;
+3.2.2 ExpenseItem Component
+Create a components/ExpenseItem.js file.
+
+// frontend/src/components/ExpenseItem.js
+import React from 'react';
+import axios from 'axios';
+
+const ExpenseItem = ({ expense, fetchExpenses }) => {
+  const handleDelete = async () => {
+    await axios.delete(`/api/expenses/${expense._id}`);
+    fetchExpenses();
+  };
+
+  return (
+    <div>
+      <h3>{expense.title}</h3>
+      <p>Amount: {expense.amount}</p>
+      <p>Category: {expense.category}</p>
+      <button onClick={handleDelete}>Delete</button>
+    </div>
+  );
+};
+
+export default ExpenseItem;
+3.2.3 ExpenseList Component
+Create a components/ExpenseList.js file.
+
+
+// frontend/src/components/ExpenseList.js
+import React from 'react';
+import ExpenseItem from './ExpenseItem';
+
+const ExpenseList = ({ expenses, fetchExpenses }) => {
+  return (
+    <div>
+      {expenses.map((expense) => (
+        <ExpenseItem
+          key={expense._id}
+          expense={expense}
+          fetchExpenses={fetchExpenses}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default ExpenseList;
+3.3 Modify App.js
+Update the src/App.js file.
+
+
+// frontend/src/App.js
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import ExpenseForm from './components/ExpenseForm';
+import ExpenseList from './components/ExpenseList';
+
+function App() {
+  const [expenses, setExpenses] = useState([]);
+
+  const fetchExpenses = async () => {
+    const response = await axios.get('/api/expenses');
+    setExpenses(response.data);
+  };
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Expense Tracker</h1>
+      <ExpenseForm fetchExpenses={fetchExpenses} />
+      <ExpenseList expenses={expenses} fetchExpenses={fetchExpenses} />
+    </div>
+  );
+}
+
+export default App;
+
+3.4 Proxy Configuration
+To enable API calls to your Express server from React, add a proxy in the frontend/package.json.
+
+
+// frontend/package.json
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "proxy": "http://localhost:5000",
+  ...
+}

@@ -1,0 +1,9 @@
+Run Backend
+bash
+cd ../backend
+node server.js
+
+4.2 Run Front-End
+bash
+cd ../frontend
+npm start

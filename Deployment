@@ -1,0 +1,16 @@
+5.1 Deploy Backend
+Use Heroku or another cloud provider to deploy the backend.
+
+bash
+
+heroku create expense-tracker-backend
+git add .
+git commit -m "Initial commit"
+git push heroku master
+
+5.2 Deploy Front-End
+Use Netlify or Vercel to deploy the front-end.
+
+bash
+npm run build
+netlify deploy
